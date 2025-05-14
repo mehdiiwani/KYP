@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizza Value Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background-color: #dd1fa4; /* Light pink background */
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background-color: rgba(201, 98, 98, 0.7); /* Slightly translucent white */
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px); /* Add blur to the background */
+            position: relative;
+            z-index: 2;
+        }
+        h1, h2 {
+            color: #1df400; /* Pinkish red */
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        .pizza-input {
+            margin-bottom: 30px;
+            padding: 25px;
+            border-radius: 10px;
+            background-color: white; /* Light background with transparency */
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #c83e4d; /* A bit darker pink */
+            font-size: 15px;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(13, 64, 202, 0.7);
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 16px;
+            background-color: rgba(255, 255, 255, 0.7); /* Light background with transparency */
+            backdrop-filter: blur(3px);
+        }
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #1235c4;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            background-color: #40e70d; /* Pinkish red */
+            color: rgb(94, 73, 229);
+            padding: 14px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        button:hover {
+            background-color: #22d0ad;
+        }
+        button:active {
+            background-color: #3be3e3;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+        #results-container, #comparison-container {
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 10px;
+            background-color: rgba(248, 248, 248, 0.7); /* Light background with transparency */
+            border: 1px solid rgba(220, 220, 220, 0.5);
+            backdrop-filter: blur(5px);
+        }
+        h2 {
+            color: #7fce1f; /* Pinkish red */
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: 600;
+            text-align: left;
+            border-bottom: 2px solid rgba(63, 75, 210, 0.7);
+            padding-bottom: 10px;
+        }
+        .pizza-result {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: rgba(53, 241, 10, 0.8);
+            border-radius: 8px;
+            border: 1px solid rgba(14, 125, 139, 0.7);
+            box-shadow: 0 2px 4px rgba(73, 233, 185, 0.08);
+            backdrop-filter: blur(3px);
+        }
+        .comparison-item {
+            margin-bottom: 25px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            border: 1px solid rgba(230, 230, 230, 0.7);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            backdrop-filter: blur(3px);
+        }
+        .remove-pizza {
+            background-color: #d2d042; /* A brighter pink */
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 15px;
+            transition: background-color 0.3s ease;
+        }
+        .remove-pizza:hover {
+            background-color: #ec407a;
+        }
+        .remove-pizza:active {
+            background-color: #d81b60;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+        .comparison-results {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            border: 1px solid rgba(230, 230, 230, 0.7);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+            backdrop-filter: blur(3px);
+        }
+        .best-value {
+            font-weight: 600;
+            color: #2e7d32;
+            background-color: #f0f4c3;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            border: 1px solid #d4e157;
+        }
+        .leaf {
+            position: absolute;
+            width: 16px;
+            height: 24px;
+            background-color: #fcd3d1;
+            border-radius: 50% 30% 50% 30%;
+            opacity: 0;
+            z-index: 1;
+            animation: fall 5s linear infinite;
+        }
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0.1;
+            }
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            .pizza-input {
+                padding: 15px;
+            }
+            input[type="number"], button {
+                font-size: 14px;
+                padding: 10px;
+            }
+            .remove-pizza {
+                font-size: 12px;
+                padding: 6px 10px;
+            }
+        }
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+            h1, h2 {
+                font-size: 24px;
+            }
+            .input-group {
+                margin-bottom: 15px;
+            }
+            input[type="number"], button {
+                font-size: 12px;
+                padding: 8px;
+            }
+            .remove-pizza {
+                font-size: 10px;
+                padding: 5px 8px;
+            }
+            .comparison-results h3 {
+                font-size: 16px;
+            }
+        }
+
+        #thank-you {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 24px;
+            color: #6ddf30;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 2s ease, pulse 2s infinite alternate;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.06); }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Know Your Pizza</h1>
+
+        <div class="pizza-input">
+            <h2>Calculate Single Pizza Value</h2>
+            <div class="input-group">
+                <label for="size">Pizza Size (inches):</label>
+                <input type="number" id="size" placeholder="e.g., 10">
+            </div>
+            <div class="input-group">
+                <label for="price">Price:</label>
+                <input type="number" id="price" placeholder="e.g., 15">
+            </div>
+            <button onclick="calculatePizza()">Calculate</button>
+            <div id="results-container" style="display: none;">
+                <h2>Results</h2>
+                <p>Area: <span id="pizza-area"></span> square inches</p>
+                <p>Price per square inch: ₹<span id="price-per-inch"></span></p>
+            </div>
+        </div>
+
+        <div class="pizza-input">
+            <h2>Compare Multiple Pizzas</h2>
+            <div id="pizza-list">
+                </div>
+            <button onclick="addPizza()">Add Pizza</button>
+            <button onclick="comparePizzas()">Compare Pizzas</button>
+            <div id="comparison-container" style="display: none;">
+                <h2>Comparison Results</h2>
+                <div id="comparison-results">
+                    </div>
+            </div>
+        </div>
+    </div>
+    <div id="thank-you">
+        Thank you for using the Know our Pizza Calculator!
+            <p>Keep using it again and again</p> 
+            <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+                        <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+                        <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+                        <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+                        <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+                        <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>            <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+                        <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+                        <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+                        <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+                        <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+                        <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+                        <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+                        <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+                        <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+                        <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            <p>. </p>
+            <p>. </p>
+            <p> .</p>
+            <p> .</p>
+            <p> .</p>
+            
+            <p>Why you here eat your pizza bruh! WTH</p>
+    </div>
+
+    <script>
+        let pizzaCount = 0;
+        const numberOfLeaves = 120;
+
+        function createLeaves() {
+            const body = document.querySelector('body');
+            for (let i = 0; i < numberOfLeaves; i++) {
+                const leaf = document.createElement('div');
+                leaf.classList.add('leaf');
+                leaf.style.left = `${Math.random() * 100}%`;
+                leaf.style.animationDelay = `${Math.random() * 5}s`;
+                body.appendChild(leaf);
+            }
+        }
+        createLeaves();
+
+        function calculatePizza() {
+            const sizeInput = document.getElementById('size');
+            const priceInput = document.getElementById('price');
+            const resultsContainer = document.getElementById('results-container');
+            const pizzaAreaSpan = document.getElementById('pizza-area');
+            const pricePerInchSpan = document.getElementById('price-per-inch');
+
+            const size = parseFloat(sizeInput.value);
+            const price = parseFloat(priceInput.value);
+
+            if (isNaN(size) || isNaN(price) || size <= 0 || price <= 0) {
+                alert('Please enter valid pizza size and price.');
+                return;
+            }
+
+            const radius = size / 2;
+            const area = Math.PI * radius * radius;
+            const pricePerSqInch = price / area;
+
+            pizzaAreaSpan.textContent = area.toFixed(2);
+            pricePerInchSpan.textContent = pricePerSqInch.toFixed(2);
+            resultsContainer.style.display = 'block';
+        }
+
+        function addPizza() {
+            pizzaCount++;
+            const pizzaList = document.getElementById('pizza-list');
+            const newPizzaDiv = document.createElement('div');
+            newPizzaDiv.classList.add('comparison-item');
+            newPizzaDiv.innerHTML = `
+                <h3>Pizza ${pizzaCount}</h3>
+                <div class="input-group">
+                    <label for="size-${pizzaCount}">Size (inches - diameter):</label>
+                    <input type="number" id="size-${pizzaCount}" placeholder="e.g., 8">
+                </div>
+                <div class="input-group">
+                    <label for="price-${pizzaCount}">Price:</label>
+                    <input type="number" id="price-${pizzaCount}" placeholder="e.g., 25">
+                </div>
+                <div class="input-group">
+                    <label for="quantity-${pizzaCount}">Quantity:</label>
+                    <input type="number" id="quantity-${pizzaCount}" value="1" min="1">
+                </div>
+                <button class="remove-pizza" onclick="removePizza(this)">Remove</button>
+            `;
+            pizzaList.appendChild(newPizzaDiv);
+        }
+
+            function removePizza(button) {
+            const pizzaItem = button.parentNode;
+            pizzaItem.remove();
+            // Re-index the remaining pizza headings for clarity (optional)
+            const pizzaItems = document.querySelectorAll('#pizza-list .comparison-item');
+            pizzaItems.forEach((item, index) => {
+                const heading = item.querySelector('h3');
+                heading.textContent = `Pizza ${index + 1}`;
+                const sizeLabel = item.querySelector('label[for^="size-"]');
+                sizeLabel.setAttribute('for', `size-${index + 1}`);
+                const sizeInput = item.querySelector('input[id^="size-"]');
+                sizeInput.setAttribute('id', `size-${index + 1}`);
+                const priceLabel = item.querySelector('label[for^="price-"]');
+                priceLabel.setAttribute('for', `price-${index + 1}`);
+                const priceInput = item.querySelector('input[id^="price-"]');
+                priceInput.setAttribute('id', `price-${index + 1}`);
+                const quantityLabel = item.querySelector('label[for^="quantity-"]');
+                quantityLabel.setAttribute('for', `quantity-${index + 1}`);
+                const quantityInput = item.querySelector('input[id^="quantity-"]');
+                quantityInput.setAttribute('id', `quantity-${index + 1}`);
+            });
+            pizzaCount = pizzaItems.length;
+        }
+
+        function comparePizzas() {
+            const comparisonResultsDiv = document.getElementById('comparison-results');
+            const pizzaItems = document.querySelectorAll('#pizza-list .comparison-item');
+            const pizzas = [];
+
+            pizzaItems.forEach(item => {
+                const sizeInput = item.querySelector('input[id^="size-"]');
+                const priceInput = item.querySelector('input[id^="price-"]');
+                 const quantityInput = item.querySelector('input[id^="quantity-"]');
+
+                const size = parseFloat(sizeInput.value);
+                const price = parseFloat(priceInput.value);
+                 const quantity = parseInt(quantityInput.value);
+
+                if (!isNaN(size) && !isNaN(price) && !isNaN(quantity) && size > 0 && price > 0 && quantity>0) {
+                    const radius = size / 2;
+                    const area = Math.PI * radius * radius * quantity;
+                    const totalPrice = price * quantity;
+                    const pricePerSqInch = totalPrice / area;
+                    pizzas.push({ name: `Pizza ${pizzas.length + 1}`, area: area, pricePerSqInch: pricePerSqInch,totalPrice:totalPrice });
+                }
+            });
+
+            if (pizzas.length < 2) {
+                alert('Please add at least two pizzas to compare.');
+                return;
+            }
+
+            pizzas.sort((a, b) => a.pricePerSqInch - b.pricePerSqInch);
+
+            let resultsHTML = '';
+            pizzas.forEach(pizza => {
+                resultsHTML += `
+                    <div class="comparison-results">
+                        <h3>${pizza.name}</h3>
+                        <p>Total Area: ${pizza.area.toFixed(2)} square inches</p>
+                         <p>Total Price: ₹${pizza.totalPrice.toFixed(2)}</p>
+                        <p>Price per square inch: ₹${pizza.pricePerSqInch.toFixed(2)}</p>
+                    </div>
+                `;
+            });
+
+            const bestValuePizza = pizzas[0];
+            resultsHTML += `<div class="comparison-results best-value"><h3>Best Value: ${bestValuePizza.name}</h3><p>Lowest price per square inch!</p></div>`;
+
+            comparisonResultsDiv.innerHTML = resultsHTML;
+            document.getElementById('comparison-container').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
