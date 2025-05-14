@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizza Value Calculator</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #e44d26;
+            text-align: center;
+        }
+        .pizza-input {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .input-group {
+            margin-bottom: 10px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #e44d26;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #d14320;
+        }
+        #results-container, #comparison-container {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .pizza-result {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 3px;
+            background-color: #fff;
+        }
+        .comparison-item {
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .remove-pizza {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        .remove-pizza:hover {
+            background-color: #c82333;
+        }
+        .comparison-results {
+            margin-top: 15px;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 3px;
+            background-color: #fff;
+        }
+        .best-value {
+            font-weight: bold;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Pizza Value Calculator</h1>
+
+        <div class="pizza-input">
+            <h2>Calculate Single Pizza Value</h2>
+            <div class="input-group">
+                <label for="size">Pizza Size (inches - diameter):</label>
+                <input type="number" id="size" placeholder="e.g., 10">
+            </div>
+            <div class="input-group">
+                <label for="price">Price:</label>
+                <input type="number" id="price" placeholder="e.g., 15">
+            </div>
+            <button onclick="calculatePizza()">Calculate</button>
+            <div id="results-container" style="display: none;">
+                <h2>Results</h2>
+                <p>Area: <span id="pizza-area"></span> square inches</p>
+                <p>Price per square inch: ₹<span id="price-per-inch"></span></p>
+            </div>
+        </div>
+
+        <div class="pizza-input">
+            <h2>Compare Multiple Pizzas</h2>
+            <div id="pizza-list">
+                </div>
+            <button onclick="addPizza()">Add Pizza</button>
+            <button onclick="comparePizzas()">Compare Pizzas</button>
+            <div id="comparison-container" style="display: none;">
+                <h2>Comparison Results</h2>
+                <div id="comparison-results">
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let pizzaCount = 0;
+
+        function calculatePizza() {
+            const sizeInput = document.getElementById('size');
+            const priceInput = document.getElementById('price');
+            const resultsContainer = document.getElementById('results-container');
+            const pizzaAreaSpan = document.getElementById('pizza-area');
+            const pricePerInchSpan = document.getElementById('price-per-inch');
+
+            const size = parseFloat(sizeInput.value);
+            const price = parseFloat(priceInput.value);
+
+            if (isNaN(size) || isNaN(price) || size <= 0 || price <= 0) {
+                alert('Please enter valid pizza size and price.');
+                return;
+            }
+
+            const radius = size / 2;
+            const area = Math.PI * radius * radius;
+            const pricePerSqInch = price / area;
+
+            pizzaAreaSpan.textContent = area.toFixed(2);
+            pricePerInchSpan.textContent = pricePerSqInch.toFixed(2);
+            resultsContainer.style.display = 'block';
+        }
+
+        function addPizza() {
+            pizzaCount++;
+            const pizzaList = document.getElementById('pizza-list');
+            const newPizzaDiv = document.createElement('div');
+            newPizzaDiv.classList.add('comparison-item');
+            newPizzaDiv.innerHTML = `
+                <h3>Pizza ${pizzaCount}</h3>
+                <div class="input-group">
+                    <label for="size-${pizzaCount}">Size (inches - diameter):</label>
+                    <input type="number" id="size-${pizzaCount}" placeholder="e.g., 8">
+                </div>
+                <div class="input-group">
+                    <label for="price-${pizzaCount}">Price:</label>
+                    <input type="number" id="price-${pizzaCount}" placeholder="e.g., 25">
+                </div>
+                <div class="input-group">
+                    <label for="quantity-${pizzaCount}">Quantity:</label>
+                    <input type="number" id="quantity-${pizzaCount}" value="1" min="1">
+                </div>
+                <button class="remove-pizza" onclick="removePizza(this)">Remove</button>
+            `;
+            pizzaList.appendChild(newPizzaDiv);
+        }
+
+        function removePizza(button) {
+            const pizzaItem = button.parentNode;
+            pizzaItem.remove();
+            // Re-index the remaining pizza headings for clarity (optional)
+            const pizzaItems = document.querySelectorAll('#pizza-list .comparison-item');
+            pizzaItems.forEach((item, index) => {
+                const heading = item.querySelector('h3');
+                heading.textContent = `Pizza ${index + 1}`;
+                const sizeLabel = item.querySelector('label[for^="size-"]');
+                sizeLabel.setAttribute('for', `size-${index + 1}`);
+                const sizeInput = item.querySelector('input[id^="size-"]');
+                sizeInput.setAttribute('id', `size-${index + 1}`);
+                const priceLabel = item.querySelector('label[for^="price-"]');
+                priceLabel.setAttribute('for', `price-${index + 1}`);
+                const priceInput = item.querySelector('input[id^="price-"]');
+                priceInput.setAttribute('id', `price-${index + 1}`);
+                const quantityLabel = item.querySelector('label[for^="quantity-"]');
+                quantityLabel.setAttribute('for', `quantity-${index + 1}`);
+                const quantityInput = item.querySelector('input[id^="quantity-"]');
+                quantityInput.setAttribute('id', `quantity-${index + 1}`);
+            });
+            pizzaCount = pizzaItems.length;
+        }
+
+        function comparePizzas() {
+            const comparisonResultsDiv = document.getElementById('comparison-results');
+            const pizzaItems = document.querySelectorAll('#pizza-list .comparison-item');
+            const pizzas = [];
+
+            pizzaItems.forEach(item => {
+                const sizeInput = item.querySelector('input[id^="size-"]');
+                const priceInput = item.querySelector('input[id^="price-"]');
+                const quantityInput = item.querySelector('input[id^="quantity-"]');
+
+                const size = parseFloat(sizeInput.value);
+                const price = parseFloat(priceInput.value);
+                const quantity = parseInt(quantityInput.value);
+
+                if (!isNaN(size) && !isNaN(price) && !isNaN(quantity) && size > 0 && price > 0 && quantity > 0) {
+                    const radius = size / 2;
+                    const area = Math.PI * radius * radius * quantity;
+                    const totalPrice = price * quantity;
+                    const pricePerSqInch = totalPrice / area;
+                    pizzas.push({ name: `Pizza ${pizzas.length + 1}`, area: area, pricePerSqInch: pricePerSqInch, totalPrice: totalPrice });
+                }
+            });
+
+            if (pizzas.length < 2) {
+                alert('Please add at least two pizzas to compare.');
+                return;
+            }
+
+            pizzas.sort((a, b) => a.pricePerSqInch - b.pricePerSqInch);
+
+            let resultsHTML = '';
+            pizzas.forEach(pizza => {
+                resultsHTML += `
+                    <div class="comparison-results">
+                        <h3>${pizza.name}</h3>
+                        <p>Total Area: ${pizza.area.toFixed(2)} square inches</p>
+                        <p>Total Price: ₹${pizza.totalPrice.toFixed(2)}</p>
+                        <p>Price per square inch: ₹${pizza.pricePerSqInch.toFixed(2)}</p>
+                    </div>
+                `;
+            });
+
+            const bestValuePizza = pizzas[0];
+            resultsHTML += `<div class="comparison-results best-value"><h3>Best Value: ${bestValuePizza.name}</h3><p>Lowest price per square inch!</p></div>`;
+
+            comparisonResultsDiv.innerHTML = resultsHTML;
+            document.getElementById('comparison-container').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
